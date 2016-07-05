@@ -1,0 +1,90 @@
+apply plugin: 'maven-publish'
+
+// path to a folder containing artifacts and pom files
+ext.sourceFolder="/path/to/folder/"
+ext.pomFiles = []
+
+println ":${name}: searching for pom files in: ${project.sourceFolder}"
+File root = new File(project.sourceFolder)
+searchFolder(root)
+println ":${name}: found ${project.pomFiles.size()}"
+
+publishing {
+    repositories {
+        maven {
+            // for testing you can publish to a local folder and compare to the source
+            url "$buildDir/repo"
+        }
+//        maven {
+//            url "https://repo-host/releases/"
+//
+//            credentials {
+//                username "repo-username"
+//                password "repo-password"
+//            }
+//        }
+    }
+}
+
+project.pomFiles.each { File f ->
+    logger.info ":${name}: configuring publication for ${f}"
+    Node pomXml = new XmlParser().parse(f)
+    String pomVersion  = pomXml.version.text()
+    String pomArtifact = pomXml.artifactId.text()
+    String pomGroup    = pomXml.groupId.text()
+
+    // any extra nodes from the source pom to be cloned during publishing
+    String[] extraNodeNames = ['name', 'description', 'developers', 'dependencies']
+    File folder = f.getParentFile()
+
+    File jarFile    = new File("${folder}/${pomArtifact}-${pomVersion}.jar")
+    File zipFile    = new File("${folder}/${pomArtifact}-${pomVersion}.zip")
+    File pluginFile = new File("${folder}/${pomArtifact}-${pomVersion}-plugin.xml")
+    File sourceFile = new File("${folder}/${pomArtifact}-${pomVersion}-sources.jar")
+
+    publishing  {
+        publications {
+            "publication_${pomGroup}_${pomArtifact}_${pomVersion}"(MavenPublication) {
+                groupId    = pomGroup
+                artifactId = pomArtifact
+                version    = pomVersion
+
+                extraNodeNames.each { n ->
+                    if (pomXml[n]) {
+                        pom.withXml {
+                            asNode().append(pomXml[n][0].clone())
+                        }
+                    }
+                }
+
+                if (jarFile.exists()) {
+                    artifact jarFile
+                }
+                if (zipFile.exists()) {
+                    artifact zipFile
+                }
+                if (sourceFile.exists()) {
+                    artifact(sourceFile) {
+                        classifier "sources"
+                    }
+                }
+                if (pluginFile.exists()) {
+                    artifact(pluginFile) {
+                        classifier "plugin"
+                    }
+                }
+            }
+        }
+    }
+}
+
+def searchFolder(File folder) {
+    folder.listFiles().each { File f ->
+        if (f.isFile() && f.name.endsWith(".pom")) {
+            project.pomFiles << f
+        } else if ( f.isDirectory() && ! f.name.startsWith('.')) {
+            searchFolder(f)
+        }
+    }
+}
+

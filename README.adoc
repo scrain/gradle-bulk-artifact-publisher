@@ -1,0 +1,14 @@
+= Gradle Maven Artifact Migrator
+
+This is a quick and dirty Gradle project for publishing a large collection of existing artifacts into a target
+repository.  I had access to the folder structure of an existing repo containing all the artifacts and POM files
+and I needed them published into another repository.
+
+== How it works
+You configure `project.ext.sourceFolder` to point to a folder containing the existing POM files and artifacts and
+the project recursively searches for POM files and artifacts to publish.  Because the search is recursive the target
+folder can be the root of the repo or a folder of a specific artifact version.  For each POM file discovered, a
+publication is configured using the Gradle `maven-publish` plugin.
+
+
+
