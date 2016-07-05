@@ -1,4 +1,4 @@
-= Gradle Maven Artifact Migrator
+= Gradle Bulk Artifact Publisher
 
 This is a quick and dirty Gradle project for publishing a large collection of existing artifacts into a target
 repository.  I had access to the folder structure of an existing repo containing all the artifacts and POM files
