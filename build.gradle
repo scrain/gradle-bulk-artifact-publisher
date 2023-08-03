@@ -1,3 +1,4 @@
+apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 // path to a folder containing artifacts and pom files
@@ -34,7 +35,18 @@ project.pomFiles.each { File f ->
     String pomGroup    = pomXml.groupId.text()
 
     // any extra nodes from the source pom to be cloned during publishing
-    String[] extraNodeNames = ['name', 'description', 'developers', 'dependencies']
+    String[] extraNodeNames = [
+            'packaging',
+            'name',
+            'description',
+            'url',
+            'inceptionYear',
+            'organization',
+            'developers',
+            'licenses',
+            'scm',
+            'dependencies'
+    ]
     File folder = f.getParentFile()
 
     File jarFile    = new File("${folder}/${pomArtifact}-${pomVersion}.jar")

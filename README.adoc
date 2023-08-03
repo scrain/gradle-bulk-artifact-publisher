@@ -17,8 +17,7 @@ See source of `build.gradle` file for more info.
 == Features
 - Handles copying over extra POM information such as dependencies, developer info, etc.  This can be expanded by adding
   to the `extraNodeNames` array.  NOTE:  That this is done by modifying the generated POM file using the technique
-  documented  https://docs.gradle.org/current/userguide/publishing_maven.html#N141A6[here] and as mentioned can yield
-  an invalid POM file.  Test carefully.
+  documented  https://docs.gradle.org/6.9.2/userguide/publishing_maven.html#sec:modifying_the_generated_pom[here].
 
 == Limitations
 - Only handles specific types of artifacts: (JARs, ZIPs, Source JARs and Grails plugin XML).  Others should be able to
